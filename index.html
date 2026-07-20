@@ -819,10 +819,16 @@ document.getElementById('compare-insight').innerHTML = `
     html += `<div style="display:flex; align-items:center; color:${COLORS.dim}; padding-right:4px; justify-content:flex-end;">${rowT}</div>`;
     tickers.forEach((colT, j) => {
       const v = matrix[i][j];
-      const t = (v+1)/2; // 0..1
       let r,g,b;
-      if (v >= 0) { r = Math.round(16 + t*8); g = Math.round(60+ (v)*157); b = Math.round(80 + (v)*100); }
-      else { r = Math.round(200* -v + 16); g = Math.round(40); b = Math.round(50); }
+      if (v >= 0) {
+        // teal gradient: intensity scales with correlation strength
+        const t = v;
+        r = Math.round(16 + t*8); g = Math.round(60 + t*157); b = Math.round(80 + t*100);
+      } else {
+        // mirrored red gradient: same structure, toward #e8584a as v → -1
+        const t = -v;
+        r = Math.round(60 + t*172); g = Math.round(60 + t*28); b = Math.round(80 - t*6);
+      }
       const bg = i===j ? '#1f2937' : `rgba(${r},${g},${b},${0.25+Math.abs(v)*0.55})`;
       html += `<div title="${rowT}-${colT}: ${v.toFixed(2)}" style="height:${cellSize}px; display:flex; align-items:center; justify-content:center; background:${bg}; border-radius:2px; color:${Math.abs(v)>0.5?'#fff':COLORS.dim};">${v.toFixed(2)}</div>`;
     });
